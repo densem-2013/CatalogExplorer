@@ -4,7 +4,6 @@ using System.Data;
 using System.Data.Common;
 using System.Data.Entity.Core.Objects;
 using System.Data.Entity.Infrastructure;
-using CatalogExplorer.DAL.Config;
 using CatalogExplorer.DAL.Repositories;
 using OneView.Common.Repositories;
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Data;
-using CatalogExplorer.DAL.Config;
 using OneView.Common.Repositories;
 
 namespace CatalogExplorer.DAL.UnitOfWork

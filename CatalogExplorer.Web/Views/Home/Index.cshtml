@@ -1,31 +1,311 @@
-﻿@{
-    ViewBag.Title = "Home Page";
+﻿@model CatalogExplorer.DAL.Models.MainView
+
+@{
+    ViewBag.Title = Model.Name;
 }
 
 <div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+    <p class="lead">Folder Name : @ViewBag.Title</p>
+    @{
+        if (Model.ParentId.HasValue)
+        {
+            <p>@Html.RouteLink("Go to Parent Catalog", new { action = "Index", id = Model.ParentId }, new { @class = "btn btn-primary btn-sm" })</p>
+        }
+    }
 </div>
 
 <div class="row">
     <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
+        <h3>Catalogs</h3>
+        <div class="row">
+
+            <div class="btn btn-primary btn-sm" id="addcat">Add New Catalog</div>
+        </div>
+        <table id="cattable" style="padding:5px">
+            @{
+                if (Model.Catalogs.Any())
+                {
+                    int i = 0;
+                    foreach (var cat in Model.Catalogs)
+                    {
+                        <tr id="@cat.Id">
+                            <td>
+                                <span>@(i = ++i)</span>
+                            </td>
+                            <td><div class="btn btn-default catalog">@cat.Name</div></td>
+                            <td><div class="btn btn-sm btn-danger catremove">Remove</div></td>
+                        </tr>
+
+                    }
+                }
+            }
+        </table>
     </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
+    <div class="col-md-8">
+        <h3>Files</h3>
+        <div class="row">
+
+            <div class="btn btn-primary btn-sm" id="addfile">Upload File</div>
+        </div>
+        <table id="filetable">
+            @{
+                if (Model.Files.Any())
+                {
+                    int j = 0;
+                    foreach (var file in Model.Files)
+                    {
+                        <tr id="@file.Id">
+                            <td>
+                                <span>@(j = ++j)</span>
+                            </td>
+                            <td><div class="btn btn-default filedownload">@file.Name</div></td>
+                            <td><div class="btn btn-danger btn-sm fileremove">Remove</div></td>
+                        </tr>
+
+                    }
+                }
+            }
+        </table>
     </div>
 </div>
+<div class="container">
+    <!-- Trigger the modal with a button -->
+    <!-- Modal -->
+    <div class="modal fade" id="catModal" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Add Catalog</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Catalog Name: <input id="catname" type="text" required /></p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+                    <button id="catok" class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Save</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Trigger the modal with a button -->
+    <!-- Modal -->
+    <div class="modal fade" id="error" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Error Message</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Error: <span id="errtext"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Trigger the modal with a button -->
+    <!-- Modal -->
+    <div class="modal fade" id="fileUploadModal" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Error Message</h4>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div>
+                            <label for="fileUpload"/>
+                            Select File to Upload: <input id="fileUpload" type="file"/>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button id="fileok" class="btn btn-success" data-dismiss="modal" aria-hidden="true">Save</button>
+                    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/bootstrap")
+<script>
+    $(document).ready(function () {
+
+        $("#addcat").on('click', function (ev) {
+            $("#catModal").modal();
+        });
+
+        $(document).on('click',
+            '.catalog',
+            function(e) {
+
+                let target = $(e.currentTarget),
+                    idTarget = target.closest('tr'),
+                    id = $(idTarget).attr('id');
+                window.location.href = "/Home/Index/" + id;
+            });
+
+        $("#catok").on('click', function (ev) {
+
+            $.ajax({
+                type: 'POST',
+                url: '/api/catalog',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    "Name": $('#catname').val(),
+                    "Path": "@Model.Path" + "/@Model.Name",
+                    "ParentId": "@Model.Id"
+                }),
+                success: function (res) {
+                    
+                    let ind = $("#cattable tr").size() + 1;
+
+                    let newcat = $("<tr id=\"" + res.id +"\" ><td>" +
+                        ind +
+                        "</td><td><div class=\"btn btn-default catalog\">" +
+                        res.name +
+                        "</a></div></td><td><div class=\" btn btn-sm btn-danger catremove\">Remove</div></td></tr>");
+
+                    $("#cattable").append(newcat);
+                },
+                error: function (response) {
+                    $("#errtext").val(response);
+                    $("#error").modal();
+                }
+            });
+        });
+
+        $(document).on('click','.catremove', function (ev) {
+
+            let target = $(ev.currentTarget),
+                idTarget = target.closest('tr'),
+                id = $(idTarget).attr('id');
+
+            $.ajax({
+                type: 'DELETE',
+                url: '/api/catalog/' + id,
+                success: function (res) {
+
+                    $(idTarget).closest('tr').remove();
+                },
+                error: function (response) {
+                    $("#errtext").val(response);
+                    $("#error").modal();
+                }
+            });
+        });
+
+        $(document).on('click', '.fileremove', function (ev) {
+
+            let target = $(ev.currentTarget),
+                idTarget = target.closest('tr'),
+                id = $(idTarget).attr('id');
+
+
+            $.ajax({
+                type: 'DELETE',
+                url: '/api/file/' + id,
+                success: function (res) {
+
+                    $(idTarget).closest('tr').remove();
+                },
+                error: function (response) {
+                    $("#errtext").val(response);
+                    $("#error").modal();
+                }
+            });
+        });
+
+        $("#addfile").on('click', function (ev) {
+            $("#fileUploadModal").modal();
+        });
+        // Download file functionality
+        $(document).on('click', '.filedownload', function (event) {
+            var target = $(event.currentTarget),
+                idTarget = target.closest('tr'),
+                id = idTarget.attr('id');
+            event.preventDefault();  //stop the browser from following
+            window.location.href = '/api/file/' + id;
+        });
+
+        $('#fileok').on('click',
+            function(event) {
+
+                var target = $(event.currentTarget),
+                    idTarget = target.closest('tr'),
+                    id = idTarget.attr('id');
+
+                let uploadingFileInfo = {
+                    'CatalogId': @Model.Id,
+                    "Path": "@Model.Path" + '/' + "@Model.Name",
+                    "Name": $('#fileUpload').val()
+                };
+
+                var data = new FormData();
+
+                for (var i in uploadingFileInfo) {
+                    if (uploadingFileInfo.hasOwnProperty(i)) {
+                        data.append(i, uploadingFileInfo[i]);
+                    }
+                }
+                var files = $("#fileUpload").get(0).files;
+
+                // Add the uploaded image content to the form data collection
+                if (files.length > 0) {
+                    data.append("file", files[0]);
+                }
+
+                // Make Ajax request with the contentType = false, and procesDate = false btn btn-default filedownload
+                $.ajax({
+                    type: "POST",
+                    url: "/api/file",
+                    contentType: false,
+                    processData: false,
+                    data: data,
+                    success: function(res) {
+
+                        let ind = $("#filetable tr").size() + 1;
+
+                        let newcat = $("<tr><td>" +
+                            ind +
+                            "</td><td><div id=\"" +
+                            res.id +
+                            "\" class=\"btn btn-default filedownload\">" +
+                            res.name +
+                            "</div></td>" +
+                            "<td><div id=\"" +
+                            res.id +
+                            "\" class=\"btn btn-danger btn-sm fileremove\">Remove</div></td></tr>");
+
+                        $("#filetable").append(newcat);
+                    },
+                    error: function(response) {
+                        $("#errtext").val(response);
+                        $("#error").modal();
+                    }
+                });
+
+            });
+    });
+</script>

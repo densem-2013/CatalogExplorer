@@ -29,8 +29,5 @@ namespace CatalogExplorer.DAL.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public string Path { get; set; }
-        public IEnumerable<FileView> Files { get; set; }
-
     }
 }

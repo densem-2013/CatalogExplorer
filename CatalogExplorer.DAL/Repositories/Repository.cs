@@ -4,7 +4,6 @@ using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using CatalogExplorer.DAL.Config;
 using LinqKit;
 using OneView.Common.Repositories;
 
